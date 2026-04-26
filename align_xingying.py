@@ -285,8 +285,8 @@ if __name__ == "__main__":
     em_dir = os.path.join(data_dir, 'processed')
     xy_dir = os.path.join(data_dir, 'raw', 'xingying')
     output_dir = os.path.join(data_dir, 'processed')
-    sub_name = 'hyq_0327'
-    sub_name_xy = 'hyq0327'
+    sub_name = 'hyq_0402'
+    sub_name_xy = 'hyq0402'
     
     sub_dir_output = os.path.join(output_dir, sub_name)
     os.makedirs(sub_dir_output, exist_ok=True)
@@ -300,13 +300,21 @@ if __name__ == "__main__":
     body_model = art.ParametricModel(paths.smpl_file)
     
     keys_to_align = ['aM', 'RMB', 'acc', 'gyro', 'mag', 'quaternion', 'linear_acc', 'ppg', 'pose_gt', 'tran_gt']
+
+    # create new path
+    # 获取真实的型荧文件夹列表并排序
+    all_xy_folders = [f for f in os.listdir(sub_dir_xy) if f.startswith('smpl_')]
+    all_xy_folders.sort() # 确保和 1.pt, 2.pt 的顺序一致
+    # 检查数量是否对得上
+    seq_names_em = os.listdir(sub_dir_em)
+    seq_names_em.sort(key=lambda x: int(x.split('.')[0])) # 1.pt, 2.pt...
     
     for i in range(0, len(seq_names_em)):
         print(f'Processing sequence {i+1}/{seq_num}...')
         
         # load xingying smpl data
-        seq_name_xy = sub_name_xy + str(i+1)
-        seq_dir_xy = os.path.join(sub_dir_xy, seq_name_xy)
+        # 直接取列表里的名字
+        seq_dir_xy = os.path.join(sub_dir_xy, all_xy_folders[i])
         save_path = seq_dir_xy
         tpose_frame = 1
         fps_set = 30
