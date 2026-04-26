@@ -155,7 +155,7 @@ if __name__ == "__main__":
     smpl_dir = os.path.join(data_dir, 'smpl')
     sensor_dir = os.path.join(data_dir, 'sensor')
     
-    subject = 'hyq_0327'
+    subject = 'hyq_0402'
     sub_dir_output = os.path.join(output_dir, subject)
     os.makedirs(sub_dir_output, exist_ok=True)
     
@@ -166,7 +166,7 @@ if __name__ == "__main__":
     print('len:', len(seq_names))
     body_model = art.ParametricModel(paths.smpl_file)
     
-    for i in range(0, len(seq_names)):
+    for i in range(21, len(seq_names)):
         print(f'Processing sequence {i+1}/{seq_num}...')
         
         # load sensor data

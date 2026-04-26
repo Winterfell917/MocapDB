@@ -154,7 +154,7 @@ def data_timestamp_alignment(data):
 if __name__ == "__main__":
     # data_path
     sensor_dir = "data/raw/sensor_raw"
-    subject = "hyq_0327"
+    subject = "hyq_0320"
     data_dir = os.path.join(sensor_dir, subject)
     
     output_dir = "data/raw/sensor"
