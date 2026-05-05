@@ -166,7 +166,7 @@ if __name__ == "__main__":
     print('len:', len(seq_names))
     body_model = art.ParametricModel(paths.smpl_file)
     
-    for i in range(21, len(seq_names)):
+    for i in range(0, len(seq_names)):
         print(f'Processing sequence {i+1}/{seq_num}...')
         
         # load sensor data

@@ -249,12 +249,27 @@ def time_align(ref_signal_1, ref_signal_2):
     return frame_bias
 
 def read_gt(save_path, manual_gt_tpose_frame, fps_set):
-    # 找到以.bvh和.xrs为后缀的唯一文件
-    bvh_files = [f for f in os.listdir(save_path) if f.endswith('.bvh')]
-    xrs_files = [f for f in os.listdir(save_path) if f.endswith('.xrs')]
-    ly_files = [f for f in os.listdir(save_path) if f.endswith('.ly')]
-    
-    bvh_path = os.path.join(save_path, bvh_files[0]) 
+    # 找到以 .bvh / .xrs / .ly 为后缀的文件（三者缺一不可）
+    if not os.path.isdir(save_path):
+        raise FileNotFoundError(f'星颖目录不存在: {os.path.abspath(save_path)}')
+    entries = os.listdir(save_path)
+    bvh_files = [f for f in entries if f.endswith('.bvh')]
+    xrs_files = [f for f in entries if f.endswith('.xrs')]
+    ly_files = [f for f in entries if f.endswith('.ly')]
+    miss = []
+    if not bvh_files:
+        miss.append('.bvh')
+    if not ly_files:
+        miss.append('.ly')
+    if not xrs_files:
+        miss.append('.xrs')
+    if miss:
+        raise FileNotFoundError(
+            f'星颖目录缺少后缀为 {miss} 的文件: {os.path.abspath(save_path)}\n'
+            f'目录内现有文件: {entries}'
+        )
+
+    bvh_path = os.path.join(save_path, bvh_files[0])
     ly_path = os.path.join(save_path, ly_files[0])
     xrs_path = os.path.join(save_path, xrs_files[0])
 
@@ -286,7 +301,7 @@ if __name__ == "__main__":
     xy_dir = os.path.join(data_dir, 'raw', 'xingying')
     output_dir = os.path.join(data_dir, 'processed')
     sub_name = 'hyq_0402'
-    sub_name_xy = 'hyq0402'
+    sub_name_xy = 'hyq_0328'
     
     sub_dir_output = os.path.join(output_dir, sub_name)
     os.makedirs(sub_dir_output, exist_ok=True)
@@ -300,21 +315,16 @@ if __name__ == "__main__":
     body_model = art.ParametricModel(paths.smpl_file)
     
     keys_to_align = ['aM', 'RMB', 'acc', 'gyro', 'mag', 'quaternion', 'linear_acc', 'ppg', 'pose_gt', 'tran_gt']
-
-    # create new path
-    # 获取真实的型荧文件夹列表并排序
-    all_xy_folders = [f for f in os.listdir(sub_dir_xy) if f.startswith('smpl_')]
-    all_xy_folders.sort() # 确保和 1.pt, 2.pt 的顺序一致
-    # 检查数量是否对得上
-    seq_names_em = os.listdir(sub_dir_em)
-    seq_names_em.sort(key=lambda x: int(x.split('.')[0])) # 1.pt, 2.pt...
     
-    for i in range(0, len(seq_names_em)):
-        print(f'Processing sequence {i+1}/{seq_num}...')
+    for i in range(15, len(seq_names_em)):
+        processed_seq = i + 1
+        print(f'Processing sequence {processed_seq}/{seq_num}...')
         
         # load xingying smpl data
-        # 直接取列表里的名字
-        seq_dir_xy = os.path.join(sub_dir_xy, all_xy_folders[i])
+        # 星颖从 15 号起与 processed 同序号错一位：n.pt 对应星颖子目录 (n+1)
+        xy_suffix = processed_seq + 1 if processed_seq >= 14 else processed_seq
+        seq_name_xy = sub_name_xy + str(xy_suffix)
+        seq_dir_xy = os.path.join(sub_dir_xy, seq_name_xy)
         save_path = seq_dir_xy
         tpose_frame = 1
         fps_set = 30
